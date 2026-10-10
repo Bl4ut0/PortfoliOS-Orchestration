@@ -11,6 +11,10 @@
     {
       "name": "PortfoliOS-Orchestration",
       "path": "."
+    },
+    {
+      "name": "PortfoliOS-Runtime",
+      "path": "PortfoliOS-Runtime"
     }
   ],
   "portfoliosWorkspace": "PortfoliOS-Browser.JS/workspace-v1"

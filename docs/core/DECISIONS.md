@@ -34,6 +34,20 @@ Verify stale claims before consolidation. Current Drive tokens stay in memory; s
 
 Evidence: [Drive source](https://github.com/Bl4ut0/PortfoliOS/blob/64629619c4712faac4aa8043c15658160219ee1a/core/gdrive-sync.js), [loading graph](https://github.com/Bl4ut0/PortfoliOS/blob/64629619c4712faac4aa8043c15658160219ee1a/core/loading-manifest.js), [service worker](https://github.com/Bl4ut0/PortfoliOS/blob/64629619c4712faac4aa8043c15658160219ee1a/sw.js).
 
+## RUNTIME-001 - Independent browser CLI execution layer
+
+Date: 2026-10-10. Status: accepted architecture; implementation foundation local.
+
+Create a separate PortfoliOS-Runtime child repository beside the OS and Browser.JS checkouts. Keep shared standards and cross-project decisions in Orchestration. Keep OS UI, profiles, SystemFS, Drive orchestration and credential policy in PortfoliOS. Runtime owns execution compatibility, process lifecycle and application recipes, exposed through explicit capabilities and loaded only on app launch.
+
+Reason: CLI compatibility needs an independent engine/build/release lifecycle without expanding ordinary OS startup. Start with an existing execution-engine evaluation before attempting a complete kernel.
+
+User workflow: public users select a private profile before launching the CLI category; private users authenticate separately with supported ChatGPT/Google AI subscription sign-in. Model API-key billing is not a substitute. Persistent AI-provider credentials and encrypted recovery remain design proposals, not an exception to the current memory-only Google Drive token policy.
+
+Affected repositories: [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration), [OS](https://github.com/Bl4ut0/PortfoliOS), [Browser.JS](https://github.com/Bl4ut0/PortfoliOS-Browser.JS), and planned [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime). Runtime publication is pending.
+
+Acceptance evidence: local private-session/workspace foundation, real raw-WASM worker proof, cancellation/teardown, and 14 automated tests. This does not demonstrate real SystemFS isolation, subscription authentication, CLI compatibility, mobile support or a production release. The [runtime roadmap](https://github.com/Bl4ut0/PortfoliOS-Runtime/blob/main/docs/ROADMAP.md) owns remaining milestones.
+
 ## Decision template
 
 - ID, date and status:

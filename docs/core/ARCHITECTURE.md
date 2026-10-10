@@ -7,6 +7,7 @@
 | [PortfoliOS-Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) | Shared standards, cross-project decisions and workspace configuration |
 | [PortfoliOS](https://github.com/Bl4ut0/PortfoliOS) | Shells, chooser, accounts, SystemFS, preferences, backup, app adapters and deployment |
 | [PortfoliOS-Browser.JS](https://github.com/Bl4ut0/PortfoliOS-Browser.JS) | Browser interface, settings, host bridge and engine build |
+| [PortfoliOS-Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime) (local scaffold; publication pending) | CLI execution compatibility, process lifecycle, capability interfaces and application recipes |
 
 New app repositories follow the same pattern: engine source/build instructions in the app repository, a lightweight adapter/catalog entry in the OS, and shared decisions here. Do not duplicate OS authentication or maintain two editable engine copies.
 
@@ -48,3 +49,11 @@ Import builds with immutable source revisions and checksums. For runtime release
 - [Staged loading](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/STAGED_LOADING.md)
 - [Loading graph](https://github.com/Bl4ut0/PortfoliOS/blob/main/core/loading-manifest.js) and [service worker](https://github.com/Bl4ut0/PortfoliOS/blob/main/sw.js)
 - [Browser host protocol](https://github.com/Bl4ut0/PortfoliOS-Browser.JS/blob/main/portfolios/INTEGRATION.md)
+
+## CLI runtime boundary
+
+The separate Runtime is loaded on application launch. PortfoliOS keeps profile selection, SystemFS, credential policy, Drive sync and native Desktop/Mobile adapters. Runtime engines receive explicit captured-profile/project capabilities and must support cancellation and teardown before profile changes. Shared standards remain in this repository; executable runtime contracts remain with runtime source.
+
+The private CLI experience requires a private PortfoliOS profile and separate supported provider authentication. Subscription sign-in is the goal; model API-key billing does not satisfy it. Runtime-vendor service requirements need independent evaluation. Native CLI auth does not prove browser compatibility. Credential persistence and encrypted recovery remain proposals; current Google Drive access tokens stay memory-only.
+
+Current implementation: local raw-WASM worker proof and host-side session/workspace foundation. Full CLI compatibility, OS integration, provider authentication and GitHub operations are not implemented. See the planned [runtime contract](https://github.com/Bl4ut0/PortfoliOS-Runtime/blob/main/docs/HOST_CONTRACT.md) and [roadmap](https://github.com/Bl4ut0/PortfoliOS-Runtime/blob/main/docs/ROADMAP.md); publication is pending.
