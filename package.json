@@ -1,0 +1,22 @@
+{
+  "name": "@portfolios/orchestration",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "status": "node scripts/workspace.mjs status",
+    "check": "node scripts/workspace.mjs check",
+    "build": "node scripts/workspace.mjs build",
+    "import:browser": "node scripts/workspace.mjs import",
+    "deploy": "node scripts/workspace.mjs deploy",
+    "deploy:dry": "node scripts/workspace.mjs deploy --dry-run",
+    "deploy:full": "node scripts/workspace.mjs deploy --full",
+    "test": "node --test scripts/tests/*.test.mjs"
+  },
+  "dependencies": {
+    "basic-ftp": "6.0.1"
+  }
+}

@@ -48,6 +48,18 @@ Affected repositories: [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orch
 
 Acceptance evidence: local private-session/workspace foundation, real raw-WASM worker proof, cancellation/teardown, and 14 automated tests. This does not demonstrate real SystemFS isolation, subscription authentication, CLI compatibility, mobile support or a production release. The [runtime roadmap](https://github.com/Bl4ut0/PortfoliOS-Runtime/blob/main/docs/ROADMAP.md) owns remaining milestones.
 
+## BUILD-001 - Shared build and deployment coordination
+
+Date: 2026-10-10. Status: implemented.
+
+Move workspace command sequencing and FTP upload transport into Orchestration. Keep the deployable asset manifest, importer and site release/cache version in the OS, and keep Browser.JS's build recipe and receipt in its repository. Existing OS deployment commands delegate to the root runner. Runtime has optional checks only until a production adapter exists.
+
+Reason: splitting source ownership should leave one discoverable workspace release entry point without duplicating engine builds or uploading sibling repositories. The user requested moving shared build/deploy tooling out of the OS.
+
+Affected repositories: [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) and [OS](https://github.com/Bl4ut0/PortfoliOS). See [the build/deploy guide](../BUILD_AND_DEPLOY.md), [workspace command manifest](../../workspace.json) and [OS deployment policy](https://github.com/Bl4ut0/PortfoliOS/blob/main/deploy.config.json).
+
+Acceptance: renamed checkout discovery, duplicate/missing checkout failures, quick/full/targeted upload selection, private-file and traversal exclusion, credential-free previews, asset-first ordering and child/transport failure propagation are checked by the orchestration tests. Project validation and real build/preview results are reported with the change; these tests do not constitute a production deployment.
+
 ## Decision template
 
 - ID, date and status:

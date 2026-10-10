@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "repositories": {
+    "os": {
+      "repository": "https://github.com/Bl4ut0/PortfoliOS",
+      "checks": [
+        [
+          "scripts/check-app-contracts.js"
+        ],
+        [
+          "scripts/check-gdrive-session.js"
+        ],
+        [
+          "scripts/check-security-kernel.js"
+        ]
+      ]
+    },
+    "browser": {
+      "repository": "https://github.com/Bl4ut0/PortfoliOS-Browser.JS",
+      "checks": [
+        [
+          "--check",
+          "scripts/build-portfolios.mjs"
+        ]
+      ],
+      "build": [
+        "scripts/build-portfolios.mjs"
+      ]
+    },
+    "runtime": {
+      "repository": "https://github.com/Bl4ut0/PortfoliOS-Runtime",
+      "status": "validation-only; no OS release adapter",
+      "checks": [
+        [
+          "scripts/check.mjs"
+        ],
+        [
+          "--test"
+        ]
+      ]
+    }
+  }
+}

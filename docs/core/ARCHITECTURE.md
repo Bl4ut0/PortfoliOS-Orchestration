@@ -4,8 +4,8 @@
 
 | Repository | Owns |
 | --- | --- |
-| [PortfoliOS-Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) | Shared standards, cross-project decisions and workspace configuration |
-| [PortfoliOS](https://github.com/Bl4ut0/PortfoliOS) | Shells, chooser, accounts, SystemFS, preferences, backup, app adapters and deployment |
+| [PortfoliOS-Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) | Shared standards, cross-project decisions, workspace configuration and build/deploy coordination |
+| [PortfoliOS](https://github.com/Bl4ut0/PortfoliOS) | Shells, chooser, accounts, SystemFS, preferences, backup, app adapters, deployment asset policy and site releases |
 | [PortfoliOS-Browser.JS](https://github.com/Bl4ut0/PortfoliOS-Browser.JS) | Browser interface, settings, host bridge and engine build |
 | [PortfoliOS-Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime) (local scaffold; publication pending) | CLI execution compatibility, process lifecycle, capability interfaces and application recipes |
 
@@ -42,6 +42,10 @@ Previously used assets may support offline entry. Do not promise offline availab
 Separate shared runtime caches from account documents and Drive backup. Public reset must not erase private files. Evaluate each engine's own persistence and save export independently.
 
 Import builds with immutable source revisions and checksums. For runtime releases, publish referenced assets before entry documents and verify the deployed version. A shared-documentation change does not require rebuilding engines.
+
+## Build and deployment ownership
+
+[The orchestration runner](../BUILD_AND_DEPLOY.md) coordinates project-owned checks, Browser builds, verified OS imports and FTP uploads. The OS owns its deployment manifest and release/cache version; app repositories retain their engine recipes and receipts. Runtime remains validation-only until a release adapter is implemented and tested. Discover child checkouts by Git origin, keep dependencies pinned, and publish assets before HTML entry points.
 
 ## Sources and implementation
 

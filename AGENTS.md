@@ -11,13 +11,14 @@ Read [the core index](docs/core/README.md), then the standards relevant to the t
 - [Application and runtime integration](docs/core/APPLICATIONS.md)
 - [Profiles, files and Drive backup](docs/core/PROFILES_AND_SYNC.md)
 - [Decision record](docs/core/DECISIONS.md)
+- [Build and deployment coordination](docs/BUILD_AND_DEPLOY.md)
 
 Also read the target repository's agent instructions and technical contract. Shared standards govern product decisions; repository documents specify executable APIs, builds and release commands. Historical audits provide dated evidence rather than new standing requirements.
 
 ## Working across repositories
 
 - Identify a checkout by its Git remote, not its folder name or npm package name.
-- Keep source changes in the owning repository. This root tracks shared documentation, decisions, workspace configuration and orchestration metadata.
+- Keep source changes in the owning repository. This root tracks shared documentation, decisions, workspace configuration, build/deployment coordination and orchestration metadata.
 - Child checkouts are ignored directories, not submodules or vendored source. Never stage them or copy their Git metadata into this repository.
 - Preserve unrelated work and stage only task-owned files in each repository.
 - Keep shared OS accounts, storage, backup and media services in PortfoliOS. Keep independently maintained application engines in their own repositories and import checked release artifacts.

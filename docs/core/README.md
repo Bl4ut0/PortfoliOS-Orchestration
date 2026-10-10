@@ -12,6 +12,7 @@ Reviewed against OS revision [6462961](https://github.com/Bl4ut0/PortfoliOS/tree
 | [Architecture](ARCHITECTURE.md) | Ownership, boot/login stages, shell separation, deferred services, caching |
 | [Applications](APPLICATIONS.md) | Adaptation, lifecycle, engines, host bridges, files, release evidence |
 | [Profiles and sync](PROFILES_AND_SYNC.md) | Public/private behavior, Google identity, account transitions, backup boundaries |
+| [Build and deployment](../BUILD_AND_DEPLOY.md) | Workspace commands, credentials, artifact import, upload policy and release verification |
 | [Decisions](DECISIONS.md) | Accepted cross-project choices, sources and decision updates |
 
 ## Guidance promoted from the primary project
