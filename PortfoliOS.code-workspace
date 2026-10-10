@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "name": "PortfoliOS",
+      "path": "PortfoliOS"
+    },
+    {
+      "name": "PortfoliOS-Browser.JS",
+      "path": "PortfoliOS-Browser.JS"
+    },
+    {
+      "name": "PortfoliOS-Orchestration",
+      "path": "."
+    }
+  ],
+  "portfoliosWorkspace": "PortfoliOS-Browser.JS/workspace-v1"
+}

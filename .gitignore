@@ -1,0 +1,15 @@
+# Exclude independent checkouts and local directories by default.
+/*/
+!/docs/
+!/scripts/
+!/.github/
+
+# Machine state, dependencies, caches and credentials.
+**/node_modules/
+**/.tmp/
+**/.env
+**/.env.*
+!**/.env.example
+**/*.log
+.DS_Store
+Thumbs.db
