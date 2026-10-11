@@ -35,3 +35,9 @@ These tests use disposable local profile fixtures, not the user's Google credent
 Published eight runtime files (0.08 MiB). Live Store checks passed for all 18 current Desktop Store entries, actual Codex Preview/Code OSS catalog installation, artwork decoding, uninstall/reinstall, moved-shortcut retention, deleted-shortcut restoration, private isolation and reload. Seven non-HTML production asset hashes matched. OS app/session/security, staged loading and the existing folder shortcut regression passed locally. These checks do not exercise every engine's gameplay/editor runtime.
 
 The separate folder audit identified non-atomic moves, missing ordinary-file/open-window drops and Drive move reconciliation defects. This follow-up does not remediate those findings.
+
+## CLI input and administrator-only Studio
+
+OS release [e034415](https://github.com/Bl4ut0/PortfoliOS/commit/e034415), build `2026.10.11.10`, deployed and checked at [production](https://os.bl4ut0.dev/?release=e034415). CLI output now scrolls inside its window while the command input remains visible; lazy and reopened windows bind click-to-focus. Portfolio Studio is hidden and direct launch is blocked until the CLI admin command succeeds. Memory-only privileges expire and clear on profile changes.
+
+Validation: project contract, Drive and SecurityKernel checks; staged loading browser checks; CLI/Studio browser regressions locally and on production using simulated admin responses; all nine deployed non-HTML runtime asset hashes matched. Production credentials were not exercised.
