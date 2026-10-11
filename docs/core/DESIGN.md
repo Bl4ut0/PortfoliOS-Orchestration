@@ -37,6 +37,8 @@ Mobile resolves semantic colors in its own palette. Desktop and Mobile appearanc
 
 Keep intentional artwork, media, document paper, game canvases and third-party skins independent. Theme their host controls. Wallpaper labels need contrast against the wallpaper itself.
 
+Use the established `>_` PortfoliOS mark: white chevron and cyan (`#22d3ee`) cursor on a dark tile, consistent with boot and the favicon. Use it for OS branding; public-profile portraits and upstream application logos remain distinct.
+
 Reuse established typography, radii, icons and components. Translucency/blur must preserve readability and responsiveness; opaque semantic surfaces suit text-heavy controls.
 
 ## Interaction and evidence
