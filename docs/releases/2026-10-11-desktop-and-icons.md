@@ -27,3 +27,11 @@ See [icon usage and format](https://github.com/Bl4ut0/PortfoliOS/blob/1b6e819/do
 ## Limits
 
 These tests use disposable local profile fixtures, not the user's Google credentials. No new cross-device Drive roundtrip is claimed. Desktop state covers files and positions, not complete restoration of running windows. Linux themes and Android icon APKs require conversion; a curated external pack catalog is future work. Artwork coverage does not certify every application engine.
+
+## Store shortcut follow-up: 2026.10.11.9
+
+[OS commit 03f9418](https://github.com/Bl4ut0/PortfoliOS/commit/03f9418) makes installed Desktop Store entries part of shortcut defaults without a pin-list edit. Explicit installation restores an absent shortcut, retains an existing shortcut in a Desktop subfolder, and stays busy until the filesystem write finishes. Uninstalled shortcuts remain stored but are hidden; ordinary refresh does not undo manual deletion. Mobile-only entries do not acquire invalid Desktop launchers.
+
+Published eight runtime files (0.08 MiB). Live Store checks passed for all 18 current Desktop Store entries, actual Codex Preview/Code OSS catalog installation, artwork decoding, uninstall/reinstall, moved-shortcut retention, deleted-shortcut restoration, private isolation and reload. Seven non-HTML production asset hashes matched. OS app/session/security, staged loading and the existing folder shortcut regression passed locally. These checks do not exercise every engine's gameplay/editor runtime.
+
+The separate folder audit identified non-atomic moves, missing ordinary-file/open-window drops and Drive move reconciliation defects. This follow-up does not remediate those findings.
