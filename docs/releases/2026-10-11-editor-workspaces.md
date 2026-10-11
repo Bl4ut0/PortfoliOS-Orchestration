@@ -1,0 +1,13 @@
+# Editor workspaces and narrow Desktop release
+
+Published 2026-10-11: OS runtime [0592a0c](https://github.com/Bl4ut0/PortfoliOS/commit/0592a0c), verification-only follow-up [5cb5e34](https://github.com/Bl4ut0/PortfoliOS/commit/5cb5e34), deployment safeguards [4300d04](https://github.com/Bl4ut0/PortfoliOS-Orchestration/commit/4300d04). Live build 2026.10.11.6 at [PortfoliOS](https://os.bl4ut0.dev/?release=0592a0c).
+
+Desktop Auto fills the dynamic viewport. At narrow widths, application windows overlay the workspace rather than joining the icon flow, and reserve the taskbar. Production Chrome checks opened Settings, File Explorer and Store at 768x850, 690x767, 850x768, 412x915, 768x740 and 1440x1000; every app stayed inside the viewport and above the taskbar. Fixed-resolution aspect ratio was retained. Physical Galaxy Fold confirmation remains outstanding.
+
+The combined release adds shared opaque Craft adapters, SystemFS Open/Save dialogs, upstream icons, bounded LightCraft library checkpoints, responsive EffectCraft WebGL presentation, Code OSS Documents integration and guarded private-to-public autosave. [The OS review](https://github.com/Bl4ut0/PortfoliOS/blob/0592a0c/docs/ARTCRAFT_REVIEW.md) separates checked features from remaining upstream limitations and future candidates.
+
+Validation: OS app/session/security checks, 18 orchestration tests, catalog generation checks, changed PHP syntax, local staged/profile/PdfCraft/Code OSS browser checks and all six Craft launch/isolation checks passed. Native PhotoCraft PSD save/reopen, LightCraft checkpoint restoration and FilmCraft/EffectCraft project output were exercised. Production PhotoCraft PSD Open/Save/reopen passed through Apache with an opaque frame.
+
+Deployment uploaded 331 files / 354.74 MiB with exact editor artifact receipt validation. Eleven changed live asset SHA-256 values matched local bytes, and all six Craft gateway routes returned the shared bridge with permissive asset CORS, cross-origin resource policy and no frame denial. Entry HTML advertises the release; Cloudflare injects its analytics script, so whole-page HTML hash equality is not claimed. Browser verification observed two speculative workspace HTML 503 responses followed by successful fetches of the same URLs; no unresolved HTTP failures remained. This host/preload behavior is recorded separately from window placement.
+
+No full upstream tool certification, field Core Web Vitals score, native terminal/extension runtime or unrestricted cloud restoration of active source files is claimed. LightCraft first interaction still needs performance work. Unrelated Browser version edits were left uncommitted and excluded from deployment.
