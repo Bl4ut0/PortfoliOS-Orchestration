@@ -4,9 +4,9 @@
 
 Google sign-in selects that account's private workspace. Desktop and Mobile share remembered profiles and can select another Google account without merging files/settings.
 
-Private profile selection and live Drive authorization are distinct states. Token expiry pauses backup; it does not remove the private workspace or local files/preferences. Settings, launchers, CLI and assistants must report the same current state.
+Private profile selection and live Drive authorization are distinct states. Token expiry never removes local files/preferences. Google workspaces now require online session verification and lock when that verification is unavailable; local-only profiles retain their separate offline behavior. Settings, launchers, CLI and assistants must report the same current state.
 
-Public access requires no Google sign-in. Do not show private backup-expiry prompts in public or ask active private users to sign in for local files. Offer reconnect only when needed for cloud backup.
+Public access requires no Google sign-in. Do not show private backup-expiry prompts in public or ask active private users to sign in for local files. Offer reconnect when needed for cloud backup or active Google-session verification; retain local files while a workspace is locked.
 
 Remembered local identity is not a server-authenticated security boundary. Continuous authenticated cloud access after reload requires an explicitly designed server-side flow.
 
@@ -34,7 +34,7 @@ Required-path failures must not advance a successful-backup manifest/timestamp. 
 
 Close/flush apps and pending writes/imports before changing scope. Capture the originating profile for async work and reject stale writes after a switch.
 
-Save-to-Drive-before-public awaits success and retains the private profile on failure. Offline public switching preserves private local changes and does not delete remembered accounts or remote backups.
+Save-to-Drive-before-public awaits success and retains the private profile on failure. Offline public switching preserves private local changes and does not delete remembered accounts or remote backups. It does not falsely claim that an unreachable server lease was released; another device must explicitly force takeover if the old owner cannot complete a handoff.
 
 Do not silently forget accounts, delete backups, clear shared engine storage or replace remote data during normal switching. Restore preview, pagination, durable retries, conflict/deletion recovery and cross-device proof remain roadmap work until implemented and verified.
 
@@ -61,3 +61,11 @@ This coordinates tabs in one browser storage partition, not separate devices. Ti
 ## Installation retention
 
 Private Store installation changes persist as per-app records; explicit uninstall markers take precedence over stale legacy lists. Explicitly installed Desktop shortcuts count as user customization. Backup acknowledges only paths processed successfully, preserves ambiguous local directories and active installed-app shortcuts, and rejects stale scanner metadata writes through an atomic SystemFS record check. See [implementation, regression evidence and remaining limits](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/INSTALL_RETENTION.md). This does not supply deletion tombstones, atomic folder moves or conditional cross-device Drive writes.
+
+## One active Google workspace and recovery
+
+A Google account has one active Desktop or Mobile workspace. Server-side verified identity, an atomic persistent lease and serialized Drive mutation gateway enforce ownership. A second session requests a handoff; the owner pauses interaction, flushes supported app saves, completes reconciliation and releases to the requester only after success. The destination reconciles before mounting. Failures block normal takeover. Force takeover requires a separate warning and preserves retained local work for recovery when that device next acquires a session.
+
+Before reconciliation, immutable recovery deltas preserve changed approved files and explicit deletion intent. Merge against confirmed content hashes; independent preference changes merge per key, conflicting documents keep both copies, and missing local storage is never sufficient deletion proof. Expected-record/absence checks protect concurrent local changes. Recovery restores selected copies through the existing SystemFS Save As dialog. Folder presence remains conservative; atomic moves and folder deletion reconciliation remain future work.
+
+All participating devices must reload the new release. Older running clients and external Drive editors do not participate in the gateway. The PHP deployment needs a persistent private directory outside its document root and reliable shared filesystem locks; independent server replicas are unsupported. Production Google credentials and engine-native saves were not exercised by automated fixture checks. See [the executable contract, host requirements and verification](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/SESSION_HANDOFF.md).

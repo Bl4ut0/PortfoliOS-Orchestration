@@ -19,8 +19,8 @@ Children remain independent Git checkouts ignored by the orchestration repositor
 | --- | --- |
 | Boot and selector | Essential script/styles, viewport setup, typed introduction and experience controls |
 | Selected experience sign-in | Shared chooser and on-demand auth; download only the selected shell in the background |
-| Profile selected | Activate profile storage/security/preferences, then mount the selected workspace |
-| Workspace ready | Begin eligible private backup and deferred services without blocking on a full upload |
+| Profile selected | Activate profile storage/security; Google profiles acquire the single active lease and reconcile retained/cloud state before preferences and workspace mounting |
+| Workspace ready | Continue eligible automatic private backup after the initial Google lease/recovery gate; start deferred services |
 | App opened | Load that app's controls, styles, engine, WASM, workers, fonts and other expensive assets |
 
 Prefetch downloads without evaluating code or mounting HTML. Mobile entry must not initialize Desktop controllers, window management or Desktop-only styles. Keep selection/sign-in responsive, with actionable recovery when preparation fails.

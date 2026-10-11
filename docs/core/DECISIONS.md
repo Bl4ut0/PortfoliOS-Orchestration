@@ -93,3 +93,9 @@ Desktop Auto fills the dynamic browser viewport at every CSS width, including fo
 ### 2026-10-11: Desktop and app artwork are profile files
 
 Use actual `/Desktop` files for shortcuts/folders and its layout JSON for icon positions/seeding. Keep custom icon overrides in `/Pictures/Icon Packs/active.json`, keyed by app ID and shared across experiences. Default upstream artwork remains checked-in, attributed and independent of user files. Portable packs contain bounded normalized PNG data, not URLs, executable markup or app code. See [OS Desktop implementation](https://github.com/Bl4ut0/PortfoliOS/blob/main/desktop/README.md) and [icon contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/APP_ICONS.md).
+
+## 2026-10-11: One active Google workspace with recoverable handoff
+
+The user selected a single active private session instead of simultaneous cross-device editing. Normal takeover must save and sync the previous workspace before releasing ownership. An explicitly forced takeover cannot save an unreachable device, so retain its last uploaded recovery delta and reconcile its remaining local changes when that device next becomes active. Public access remains unrestricted. Google workspace entry now waits for online ownership verification and reconciliation before mounting the selected shell. Preserve conflicting versions and explicit deletion intent rather than using timestamp-only overwrite decisions.
+
+Implemented scope and limits: [OS session handoff framework](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/SESSION_HANDOFF.md). This decision does not claim engine-native save coverage, atomic folder moves, independent-server coordination or retroactive protection of older loaded clients.
