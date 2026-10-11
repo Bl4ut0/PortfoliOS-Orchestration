@@ -58,3 +58,5 @@ Populate the orchestration .env privately using [.env.example](../.env.example),
 During migration, an existing ignored OS .env is read only when the orchestration .env is absent. The runner uses one file source, then lets process environment variables override it. An incomplete root .env does not silently borrow secrets from the OS file. Credentials remain local; no secret file is moved, committed, logged or uploaded. A preview does not read either credential file.
 
 The OS node deploy.js and existing npm deployment scripts delegate to this runner when the OS lives inside a checkout whose origin is PortfoliOS-Orchestration. A standalone OS clone receives setup instructions instead of keeping a second uploader implementation. Deployment dependencies and their lockfile are versioned here; OS package scripts retain dependency-free local validation.
+
+Published evidence: [2026-10-10 private workspace release](releases/2026-10-10-private-workspace.md).
