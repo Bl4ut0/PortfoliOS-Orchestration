@@ -89,3 +89,7 @@ Desktop Auto fills the dynamic browser viewport at every CSS width, including fo
 - Source/contract links:
 - Validation and limits:
 - Supersedes:
+
+### 2026-10-11: Desktop and app artwork are profile files
+
+Use actual `/Desktop` files for shortcuts/folders and its layout JSON for icon positions/seeding. Keep custom icon overrides in `/Pictures/Icon Packs/active.json`, keyed by app ID and shared across experiences. Default upstream artwork remains checked-in, attributed and independent of user files. Portable packs contain bounded normalized PNG data, not URLs, executable markup or app code. See [OS Desktop implementation](https://github.com/Bl4ut0/PortfoliOS/blob/main/desktop/README.md) and [icon contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/APP_ICONS.md).

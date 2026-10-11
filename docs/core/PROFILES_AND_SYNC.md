@@ -45,3 +45,9 @@ Do not silently forget accounts, delete backups, clear shared engine storage or 
 - [Drive implementation](https://github.com/Bl4ut0/PortfoliOS/blob/main/core/gdrive-sync.js)
 - [Mobile safe switching](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/MOBILE_APP_PARITY.md#profile-switching)
 - [Remaining backup milestones](https://github.com/Bl4ut0/PortfoliOS/blob/main/ROADMAP.md)
+
+## Desktop and icon files
+
+Private `/Desktop` shortcut/folder contents and `/Desktop/desktop-layout.json` persist through reload and participate in normal approved-file backup. Restore saved remote Desktop state before freshly seeded defaults on first Drive sync; deliberate local customization remains a normal merge input. Public Desktop state resets with the public workspace.
+
+Custom app artwork is stored in `/Pictures/Icon Packs/active.json`, under the same private/public profile rules. Only normalized passive PNG data is activated. Bounded portable pack imports validate completely before replacing the active pack. Async conversion and writes must retain their originating owner. The local tests cover profile isolation, reload and public reset; they do not establish a fresh cross-device Drive roundtrip.

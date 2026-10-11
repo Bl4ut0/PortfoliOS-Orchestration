@@ -55,3 +55,9 @@ Use relevant rendered appearance checks. A historical audit or Desktop screensho
 - [Appearance audit and limitations](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/APPEARANCE_AUDIT.md)
 - [Mobile presentation](https://github.com/Bl4ut0/PortfoliOS/blob/main/mobile/README.md) and [adaptation map](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/MOBILE_APP_PARITY.md)
 - [Staged entry implementation](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/STAGED_LOADING.md)
+
+## Desktop content and application artwork
+
+Desktop shortcuts and folders are actual profile-scoped SystemFS entries in `/Desktop`; its square icon grid uses `/Desktop/desktop-layout.json` for positions and default-shortcut seeding. Moving a shortcut into a folder must move the underlying file. Desktop layout does not imply full window-session restoration.
+
+Prefer local upstream app logos with attribution. Purpose-built tools use distinct colored project tiles; preserve the OS `>_` mark separately. App icon overrides use stable app IDs and apply across Desktop/Mobile launchers, Store and host chrome. Appearance exposes raster uploads and portable PortfoliOS pack import/export. Do not treat Linux icon themes or Android APK packs as directly compatible. See [the executable icon contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/APP_ICONS.md).
