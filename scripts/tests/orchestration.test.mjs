@@ -65,6 +65,13 @@ test("quick and full deployment include the intended engines and publish all ass
   assert(full.includes("apps/game/gamedata/save.dat"));
 });
 
+test("full deployment preserves legal game bundle names containing brackets, spaces and tildes", t => {
+  const root = workspace(t); manifest(root);
+  for (const file of ["apps/game/gamedata/DM-Deck16][.unr", "apps/game/runtime~main.js", "apps/game/a file.dat"]) write(root, file);
+  const files = planDeployment(root, ["--full"]).files.map(file => file.relative);
+  for (const file of ["apps/game/gamedata/DM-Deck16][.unr", "apps/game/runtime~main.js", "apps/game/a file.dat"]) assert(files.includes(file));
+});
+
 test("targeted deploy rejects escapes, secrets, nonexistent files and symbolic links", t => {
   const root = workspace(t); manifest(root);
   for (const item of ["../.env", "apps/../.env", ".env", "scripts/private.js", "apps/browser/.env", "apps/missing.js", "apps/", "apps\\secret.js"]) {

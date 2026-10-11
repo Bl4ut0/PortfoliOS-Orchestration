@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 function safePath(value) {
-  if (typeof value !== "string" || !value || value.includes("\\") || path.posix.isAbsolute(value) || !/^[\w./-]+$/.test(value) || value.split("/").some(part => !part || [".", ".."].includes(part))) throw new Error("Unsafe deployment path: " + value);
+  if (typeof value !== "string" || !value || value.includes("\\") || path.posix.isAbsolute(value) || /[\u0000-\u001f\u007f:<>"|?*]/.test(value) || value.split("/").some(part => !part || [".", ".."].includes(part))) throw new Error("Unsafe deployment path: " + value);
   if (value.split("/").some(part => part.startsWith(".") && part !== ".htaccess" || part === "node_modules" || /\.(?:log|pem|key)$/i.test(part))) throw new Error("Private/development path cannot be deployed: " + value);
   return value;
 }
@@ -75,12 +75,13 @@ export function deploymentSettings(root, osRoot, environment = process.env) {
   return { host: values.FTP_HOST, user: values.FTP_USER, password: values.FTP_PASS, port, secure: values.FTP_SECURE?.toLowerCase() === "true", remoteDir };
 }
 
-export async function uploadPlan(client, settings, plan) {
+export async function uploadPlan(client, settings, plan, onProgress = () => {}) {
   await client.access({ host: settings.host, user: settings.user, password: settings.password, port: settings.port, secure: settings.secure });
   for (const file of plan.files) {
     const remote = path.posix.join(settings.remoteDir, file.relative);
     await client.ensureDir(path.posix.dirname(remote));
     await client.uploadFrom(file.absolute, path.posix.basename(remote));
+    onProgress(file);
   }
 }
 
@@ -96,7 +97,18 @@ export async function deploy(root, osRoot, plan, dryRun = false) {
   const { Client } = await import("basic-ftp");
   const client = new Client();
   try {
-    await uploadPlan(client, settings, plan);
+    let uploaded = 0;
+    let lastProgress = Date.now();
+    client.trackProgress(info => {
+      if (Date.now() - lastProgress >= 10000) {
+        console.log(`Upload progress: ${(info.bytesOverall / 1024 / 1024).toFixed(1)} MiB transferred.`);
+        lastProgress = Date.now();
+      }
+    });
+    await uploadPlan(client, settings, plan, file => {
+      uploaded++;
+      if (uploaded % 25 === 0 || uploaded === plan.files.length) console.log(`[${uploaded}/${plan.files.length}] ${file.relative}`);
+    });
     console.log(`Deployment complete: ${plan.files.length} files uploaded. Verify the release at the configured site.`);
   } finally { client.close(); }
 }

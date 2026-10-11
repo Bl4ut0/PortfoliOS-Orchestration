@@ -49,7 +49,7 @@ npm run deploy:dry -- --only=apps/browser,core/browser-workspace.js,index.html
 npm run deploy -- --only=apps/browser,core/browser-workspace.js,index.html
 ```
 
-Selections must stay within manifest roots. Traversal and symbolic links are refused. Private dotfiles, node_modules, logs and key files are excluded even inside application directories. The plan counts individual files and bytes. All non-HTML assets upload before embedded HTML, the service worker and the OS index. A failed upload stops the sequence immediately; FTP is not an atomic release or an automatic rollback system. Existing remote files are not deleted by this runner.
+Selections must stay within manifest roots. Traversal and symbolic links are refused. Private dotfiles, node_modules, logs and key files are excluded even inside application directories. Legal asset names containing spaces, brackets or tildes are preserved. The plan counts individual files and bytes; real uploads report byte and file progress without logging credentials. All non-HTML assets upload before embedded HTML, the service worker and the OS index. A failed upload stops the sequence immediately; FTP is not an atomic release or an automatic rollback system. Existing remote files are not deleted by this runner.
 
 ## Deployment credentials
 

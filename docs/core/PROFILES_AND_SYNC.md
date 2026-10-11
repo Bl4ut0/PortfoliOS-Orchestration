@@ -18,6 +18,8 @@ Private profiles retain separate SystemFS documents, downloads, pictures, music,
 
 Shared engine binaries/caches are device resources, not account backups. They must not hold private document metadata. Engine-native saves/recovery databases require separate account/export verification.
 
+Current verification and gaps are recorded in the [OS private experience audit](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/PRIVATE_EXPERIENCE_VALIDATION.md). In particular, the legacy ROM library is device-shared; document-isolation checks do not certify it or every engine-native save. Do not silently migrate or remove existing ROMs without an attributable owner and migration plan.
+
 ## Credentials and backup
 
 Google access tokens are memory-only. Do not store bearer tokens in local/session storage, SystemFS, debug exports, URLs or iframe messages. Remembered account metadata and preferences are separate from credentials.
