@@ -51,3 +51,9 @@ Do not silently forget accounts, delete backups, clear shared engine storage or 
 Private `/Desktop` shortcut/folder contents and `/Desktop/desktop-layout.json` persist through reload and participate in normal approved-file backup. Restore saved remote Desktop state before freshly seeded defaults on first Drive sync; deliberate local customization remains a normal merge input. Public Desktop state resets with the public workspace.
 
 Custom app artwork is stored in `/Pictures/Icon Packs/active.json`, under the same private/public profile rules. Only normalized passive PNG data is activated. Bounded portable pack imports validate completely before replacing the active pack. Async conversion and writes must retain their originating owner. The local tests cover profile isolation, reload and public reset; they do not establish a fresh cross-device Drive roundtrip.
+
+## Same-browser session coordination
+
+Private preference saves/restores use origin-wide Web Locks, current-value snapshots and per-setting revisions. Peer tabs refresh the active profile's preferences without selecting another account. Only one tab may run Drive backup for a profile at a time; closing/failing releases ownership. Explicit preference resets survive older restores. Desktop and native Mobile themes remain separate.
+
+This coordinates tabs in one browser storage partition, not separate devices. Timestamp-based revisions are not distributed conflict resolution; desktop-layout writes, cross-device install merges and Drive move/deletion races remain separate work. See [the implementation and evidence](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/MULTI_SESSION.md).
