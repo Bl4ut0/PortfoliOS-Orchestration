@@ -72,6 +72,14 @@ Native interaction follow-up: keep the editor as the application surface. Its fi
 
 PhotoCraft, VectorCraft, mobile editing, portable engine recovery and broad upstream-feature certification remain separate evaluations. A working PDF import/edit/save/reopen flow does not certify the whole suite.
 
+## 2026-10-11: bounded Craft adapters and Code OSS Documents provider
+
+The six additional Craft browser-download engines use one bounded first-party bridge for native file input, contextual SystemFS dialogs and Blob downloads. Opaque frames never gain parent-origin DOM/IndexedDB or credentials. Their pinned compiled engines are unmodified. PdfCraft retains its proven adapter. Engine-local settings are ephemeral except LightCraft's explicit profile-owned files-store checkpoint. A native project acknowledgement is required before closing; ambiguous multi-document editors additionally require explicit confirmation.
+
+Code OSS uses an actual web workbench and a Documents-only filesystem provider. UTF-8 source saved by its local writer is inert text; general import and cloud active-content quarantine remain unchanged. Native terminals/extensions are a separate runtime decision. Heavy engines stay out of boot/login. See [per-app evidence and remaining gates](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/ARTCRAFT_REVIEW.md). This supersedes the earlier statement that PhotoCraft/VectorCraft adapters were wholly future work, without promoting every upstream tool to verified status.
+
+Desktop Auto fills the dynamic browser viewport at every CSS width, including foldables. A width breakpoint may alter window presentation, but must not shrink the chosen Desktop into a preview. Mobile remains independent.
+
 ## Decision template
 
 - ID, date and status:

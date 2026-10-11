@@ -179,3 +179,12 @@ test("PdfCraft deployment requires receipt-matching artifacts", t => {
   write(root,"apps/pdfcraft/runtime/v0.6.0/engine.wasm","bad");
   assert.throws(()=>planDeployment(root),/checksum mismatch/);
 });
+
+for(const app of ['photocraft','vectorcraft','designcraft','lightcraft','filmcraft','effectcraft','vscode'])test(app+' deployment requires pinned artifacts',t=>{
+ const root=workspace(t);manifest(root);write(root,'apps/'+app+'/release.json',JSON.stringify({version:'1.0.0',files:{'engine.js':{bytes:3,sha256:'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'}}}));
+ assert.throws(()=>planDeployment(root),/Missing .* artifact/);const artifact='apps/'+app+'/runtime/'+(app==='vscode'?'dist':'v1.0.0')+'/engine.js';write(root,artifact,'abc');assert(planDeployment(root).files.some(f=>f.relative===artifact));write(root,artifact,'bad');assert.throws(()=>planDeployment(root),/checksum mismatch/);
+});
+
+test('LightCraft hidden Rust locks remain hash-verified and never upload',t=>{
+ const root=workspace(t);manifest(root);const locks=['.cargo-lock','.cargo-artifact-lock','.cargo-build-lock'];const files=Object.fromEntries(locks.map(name=>[name,{bytes:0,sha256:'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}]));write(root,'apps/lightcraft/release.json',JSON.stringify({version:'0.6.0',files}));for(const name of locks)write(root,'apps/lightcraft/runtime/v0.6.0/'+name,'');assert(!planDeployment(root).files.some(f=>locks.some(name=>f.relative.endsWith('/'+name))));write(root,'apps/lightcraft/runtime/v0.6.0/.cargo-lock','tampered');assert.throws(()=>planDeployment(root),/checksum mismatch/);
+});

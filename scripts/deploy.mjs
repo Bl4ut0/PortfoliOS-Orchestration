@@ -21,6 +21,7 @@ export function planDeployment(osRoot, flags = []) {
   const files = new Map();
   const skipped = [];
   const visit = relative => {
+    if(relative === "apps/vscode/build"){skipped.push(relative);return;}
     safePath(relative);
     const absolute = path.join(osRoot, relative);
     const stat = fs.lstatSync(absolute);
@@ -46,16 +47,24 @@ export function planDeployment(osRoot, flags = []) {
     }
     visit(relative);
   }
-  // A fresh checkout must not publish the PdfCraft launcher without its pinned engine.
-  if (files.has("apps/pdfcraft/release.json")) {
-    const receipt = JSON.parse(fs.readFileSync(files.get("apps/pdfcraft/release.json").absolute, "utf8"));
-    if (!/^\d+\.\d+\.\d+$/.test(receipt.version) || !receipt.files || !Object.keys(receipt.files).length) throw new Error("Invalid PdfCraft release receipt.");
-    for (const [name, expected] of Object.entries(receipt.files)) {
-      const relative = safePath("apps/pdfcraft/runtime/v" + receipt.version + "/" + name);
-      const artifact = files.get(relative);
-      if (!artifact) throw new Error("Missing PdfCraft artifact: " + relative + ". Run python scripts/import-pdfcraft.py in the OS checkout.");
-      const bytes = fs.readFileSync(artifact.absolute);
-      if (bytes.length !== expected.bytes || createHash("sha256").update(bytes).digest("hex") !== expected.sha256) throw new Error("PdfCraft artifact checksum mismatch: " + relative);
+  // Installed launchers must never be published with missing or modified pinned engines.
+  for (const app of ['pdfcraft','photocraft','vectorcraft','designcraft','lightcraft','filmcraft','effectcraft','vscode']) {
+    const receiptFile=files.get('apps/'+app+'/release.json');if(!receiptFile)continue;
+    const receipt=JSON.parse(fs.readFileSync(receiptFile.absolute,'utf8'));
+    if(!/^\d+\.\d+\.\d+$/.test(receipt.version)||!receipt.files||!Object.keys(receipt.files).length)throw new Error('Invalid '+app+' release receipt.');
+    for(const [name,expected] of Object.entries(receipt.files)){
+      // This upstream Rust lock metadata is verified locally but remains forbidden to upload.
+      if(app==='lightcraft'&&['.cargo-lock','.cargo-artifact-lock','.cargo-build-lock'].includes(name)){
+        const metadata=path.join(osRoot,'apps/lightcraft/runtime/v'+receipt.version,name);
+        if(fs.lstatSync(metadata).isSymbolicLink())throw new Error('Refusing linked LightCraft metadata.');
+        const bytes=fs.readFileSync(metadata);
+        if(bytes.length!==expected.bytes||createHash('sha256').update(bytes).digest('hex')!==expected.sha256)throw new Error('lightcraft artifact checksum mismatch: '+name);
+        continue;
+      }
+      const relative=safePath('apps/'+app+'/runtime/'+(app==='vscode'?'dist':'v'+receipt.version)+'/'+name),artifact=files.get(relative);
+      if(!artifact)throw new Error('Missing '+(app==='pdfcraft'?'PdfCraft':app)+' artifact: '+relative+'. Run the project-owned runtime importer/build first.');
+      const bytes=fs.readFileSync(artifact.absolute);
+      if(bytes.length!==expected.bytes||createHash('sha256').update(bytes).digest('hex')!==expected.sha256)throw new Error((app==='pdfcraft'?'PdfCraft':app)+' artifact checksum mismatch: '+relative);
     }
   }
   const priority = file => file === "index.html" ? 3 : file === "sw.js" ? 2 : file.endsWith(".html") ? 1 : 0;
