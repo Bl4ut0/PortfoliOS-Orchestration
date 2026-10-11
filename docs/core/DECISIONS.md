@@ -68,6 +68,8 @@ Use the official checksum-pinned PdfCraft web release with an opaque sandbox and
 
 Desktop applications may provide an optional asynchronous `beforeClose` hook. Returning false preserves the window; profile switching runs guards before closing any apps or changing identity. Dirty PdfCraft edits and failed output writes veto destruction. `onClose` remains teardown after approval. See [integration evidence and limits](https://github.com/Bl4ut0/PortfoliOS/blob/main/apps/pdfcraft/README.md).
 
+Native interaction follow-up: keep the editor as the application surface. Its file-input requests enter a contextual OS file dialog through a first-party browser-environment adapter; the loaded OS profile determines storage. Do not add a permanent wrapper workspace/file dropdown alongside an editor that already exposes Open/Save. File Explorer launch parameters use the same scoped Open path. Upstream engine artifacts remain unmodified.
+
 PhotoCraft, VectorCraft, mobile editing, portable engine recovery and broad upstream-feature certification remain separate evaluations. A working PDF import/edit/save/reopen flow does not certify the whole suite.
 
 ## Decision template
