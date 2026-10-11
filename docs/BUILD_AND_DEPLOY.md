@@ -64,3 +64,5 @@ Published evidence: [private workspace release](releases/2026-10-10-private-work
 ## PdfCraft release artifacts
 
 Before a fresh OS checkout publishes PdfCraft, run `python scripts/import-pdfcraft.py` inside that checkout. The importer restores ignored, checksum-pinned official artifacts; see [the OS adapter receipt and workflow](https://github.com/Bl4ut0/PortfoliOS/tree/main/apps/pdfcraft). Deploying the PdfCraft directory checks every receipt-listed artifact before upload and fails on missing or modified bytes. This prevents publishing an installed-app launcher with an absent engine. Engine source remains [upstream](https://github.com/storytold/pdfcraft); no sibling source checkout is deployed.
+
+Published PdfCraft evidence: [first ArtCraft integration release](releases/2026-10-11-pdfcraft.md).
