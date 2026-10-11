@@ -168,3 +168,14 @@ test("CLI dispatches build and import using detected renamed checkouts and propa
   assert.match(failed.stderr, /Command failed \(9\)/);
   assert(!failed.stdout.includes("deployment:"));
 });
+
+
+test("PdfCraft deployment requires receipt-matching artifacts", t => {
+  const root = workspace(t); manifest(root);
+  write(root, "apps/pdfcraft/release.json", JSON.stringify({version:"0.6.0",files:{"engine.wasm":{bytes:3,sha256:"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}}));
+  assert.throws(()=>planDeployment(root),/Missing PdfCraft artifact/);
+  write(root,"apps/pdfcraft/runtime/v0.6.0/engine.wasm","abc");
+  assert(planDeployment(root).files.some(file=>file.relative.endsWith("engine.wasm")));
+  write(root,"apps/pdfcraft/runtime/v0.6.0/engine.wasm","bad");
+  assert.throws(()=>planDeployment(root),/checksum mismatch/);
+});

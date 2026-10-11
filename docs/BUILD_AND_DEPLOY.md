@@ -60,3 +60,7 @@ During migration, an existing ignored OS .env is read only when the orchestratio
 The OS node deploy.js and existing npm deployment scripts delegate to this runner when the OS lives inside a checkout whose origin is PortfoliOS-Orchestration. A standalone OS clone receives setup instructions instead of keeping a second uploader implementation. Deployment dependencies and their lockfile are versioned here; OS package scripts retain dependency-free local validation.
 
 Published evidence: [private workspace release](releases/2026-10-10-private-workspace.md) and [application reliability release](releases/2026-10-10-app-reliability.md).
+
+## PdfCraft release artifacts
+
+Before a fresh OS checkout publishes PdfCraft, run `python scripts/import-pdfcraft.py` inside that checkout. The importer restores ignored, checksum-pinned official artifacts; see [the OS adapter receipt and workflow](https://github.com/Bl4ut0/PortfoliOS/tree/main/apps/pdfcraft). Deploying the PdfCraft directory checks every receipt-listed artifact before upload and fails on missing or modified bytes. This prevents publishing an installed-app launcher with an absent engine. Engine source remains [upstream](https://github.com/storytold/pdfcraft); no sibling source checkout is deployed.

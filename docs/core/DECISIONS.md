@@ -60,6 +60,16 @@ Affected repositories: [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orch
 
 Acceptance: renamed checkout discovery, duplicate/missing checkout failures, quick/full/targeted upload selection, private-file and traversal exclusion, credential-free previews, asset-first ordering and child/transport failure propagation are checked by the orchestration tests. Project validation and real build/preview results are reported with the change; these tests do not constitute a production deployment.
 
+## PdfCraft: unmodified engine, isolated host file bridge
+
+Date: 2026-10-11. Status: implemented in the OS.
+
+Use the official checksum-pinned PdfCraft web release with an opaque sandbox and native SystemFS Open/Save controls. Keep editable engine source upstream, ignored release artifacts outside Git, and adapter/catalog/provenance in [PortfoliOS](https://github.com/Bl4ut0/PortfoliOS/tree/main/apps/pdfcraft). The exact owned frame alone may send bounded document messages. Runtime public-asset CORS does not grant access to user storage or tokens.
+
+Desktop applications may provide an optional asynchronous `beforeClose` hook. Returning false preserves the window; profile switching runs guards before closing any apps or changing identity. Dirty PdfCraft edits and failed output writes veto destruction. `onClose` remains teardown after approval. See [integration evidence and limits](https://github.com/Bl4ut0/PortfoliOS/blob/main/apps/pdfcraft/README.md).
+
+PhotoCraft, VectorCraft, mobile editing, portable engine recovery and broad upstream-feature certification remain separate evaluations. A working PDF import/edit/save/reopen flow does not certify the whole suite.
+
 ## Decision template
 
 - ID, date and status:

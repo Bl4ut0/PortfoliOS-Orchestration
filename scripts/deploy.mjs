@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 
 function safePath(value) {
   if (typeof value !== "string" || !value || value.includes("\\") || path.posix.isAbsolute(value) || /[\u0000-\u001f\u007f:<>"|?*]/.test(value) || value.split("/").some(part => !part || [".", ".."].includes(part))) throw new Error("Unsafe deployment path: " + value);
@@ -44,6 +45,18 @@ export function planDeployment(osRoot, flags = []) {
       continue;
     }
     visit(relative);
+  }
+  // A fresh checkout must not publish the PdfCraft launcher without its pinned engine.
+  if (files.has("apps/pdfcraft/release.json")) {
+    const receipt = JSON.parse(fs.readFileSync(files.get("apps/pdfcraft/release.json").absolute, "utf8"));
+    if (!/^\d+\.\d+\.\d+$/.test(receipt.version) || !receipt.files || !Object.keys(receipt.files).length) throw new Error("Invalid PdfCraft release receipt.");
+    for (const [name, expected] of Object.entries(receipt.files)) {
+      const relative = safePath("apps/pdfcraft/runtime/v" + receipt.version + "/" + name);
+      const artifact = files.get(relative);
+      if (!artifact) throw new Error("Missing PdfCraft artifact: " + relative + ". Run python scripts/import-pdfcraft.py in the OS checkout.");
+      const bytes = fs.readFileSync(artifact.absolute);
+      if (bytes.length !== expected.bytes || createHash("sha256").update(bytes).digest("hex") !== expected.sha256) throw new Error("PdfCraft artifact checksum mismatch: " + relative);
+    }
   }
   const priority = file => file === "index.html" ? 3 : file === "sw.js" ? 2 : file.endsWith(".html") ? 1 : 0;
   const ordered = [...files.values()].sort((a, b) => priority(a.relative) - priority(b.relative) || a.relative.localeCompare(b.relative));
