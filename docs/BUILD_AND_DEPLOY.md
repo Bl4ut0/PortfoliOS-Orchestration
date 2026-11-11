@@ -1,6 +1,6 @@
 # Workspace build and deployment
 
-[PortfoliOS-Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) owns workspace command sequencing and FTP upload transport. Each project owns its executable build/check contracts. [PortfoliOS](https://github.com/Bl4ut0/PortfoliOS) owns the production site, its release/cache version, deployment asset manifest and Browser.JS importer. [Browser.JS](https://github.com/Bl4ut0/PortfoliOS-Browser.JS) owns its engine build and artifact receipt. [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime) currently participates through optional validation only; it has no production OS release adapter.
+[PortfoliOS-Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) owns workspace command sequencing and FTP upload transport. Each project owns its executable build/check contracts. [PortfoliOS](https://github.com/Bl4ut0/PortfoliOS) owns the production site, its release/cache version, deployment asset manifest, Browser.JS importer and M3-Prism importer. [Browser.JS](https://github.com/Bl4ut0/PortfoliOS-Browser.JS) and [M3-Prism](https://github.com/Bl4ut0/M3-Prism) own their engine builds and artifact receipts (`release.json`). [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime) currently participates through optional validation only; it has no production OS release adapter.
 
 ## Setup
 
@@ -23,6 +23,9 @@ npm run status
 | npm run build | Build Browser.JS using its existing recipe; source must be committed and clean |
 | npm run build -- --install | Also install the pinned Browser frontend dependencies through its recipe |
 | npm run import:browser | Run the OS importer against the detected Browser checkout; verify revision and checksums |
+| npm run push:dry | List the exact upload plan for Git-changed deployable files; no credentials or network required |
+| npm run push | Run OS checks, then upload only Git-changed/modified deployable files |
+| npm run deploy:changed | Alias for `npm run push` (`deploy --changed`) |
 | npm run deploy:dry | List the exact quick upload plan; no credentials or network required |
 | npm run deploy | Run OS checks, then upload the existing site and imported assets |
 | npm run deploy:full | Include the configured large engines/data; does not build or download them |
@@ -35,16 +38,18 @@ For a first Browser build, initialize its pinned Dreamland submodule as describe
 1. Validate and commit engine source in its owning repository. Run npm run build and npm run import:browser only when releasing a Browser.JS change. The importer rejects modified source, stale revision receipts and checksum mismatches.
 2. Review generated OS changes. Apply the OS release/cache version process when browser-facing assets change; these commands do not invent or bump versions.
 3. Run npm run check and relevant browser/lifecycle checks from the [OS integration guide](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/BROWSER_PROVIDERS.md). Review and commit the release in the affected repositories, then push using their normal release process.
-4. Preview with npm run deploy:dry. Upload with npm run deploy, or use the full mode when the release requires large assets.
+4. Preview with `npm run push:dry` (changed files only) or `npm run deploy:dry`. Upload with `npm run push`, `npm run deploy`, or `npm run deploy:full` when the release requires large assets.
 5. Verify the configured public URL, release/cache version and changed asset hashes. For Browser releases, compare the live release.json revision with the imported receipt. Test Desktop/Mobile entry and the changed app paths.
 
 A deploy publishes the existing OS files; it does not build engines, import an artifact, change a version, push Git, or claim that HTTP/browser verification passed. Tooling/documentation-only changes do not require uploading the web runtime.
 
 ## Upload policy
 
-[The OS manifest](https://github.com/Bl4ut0/PortfoliOS/blob/main/deploy.config.json) controls deployable site paths, optional documentation and large-asset exclusions. Quick mode preserves the previous large-root and gamedata exclusions. Full mode includes available configured assets. Missing default assets are counted as skipped; an explicitly requested missing path fails.
+[The OS manifest](https://github.com/Bl4ut0/PortfoliOS/blob/main/deploy.config.json) controls deployable site paths, optional documentation and large-asset exclusions. Changed mode (`npm run push` or `npm run deploy:changed`) selects only Git-modified, untracked, unpushed, or latest-commit deployable files. Quick mode preserves the large-root, nested large-archive, and gamedata exclusions. Full mode includes available configured assets. Missing default assets are counted as skipped; an explicitly requested missing path fails.
 
 ```sh
+npm run push:dry
+npm run push
 npm run deploy:dry -- --only=apps/browser,core/browser-workspace.js,index.html
 npm run deploy -- --only=apps/browser,core/browser-workspace.js,index.html
 ```
