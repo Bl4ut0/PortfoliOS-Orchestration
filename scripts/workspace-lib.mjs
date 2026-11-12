@@ -16,6 +16,12 @@ export function git(directory, args) {
   return result;
 }
 
+function sameRealpath(a, b) {
+  const left = fs.realpathSync(a);
+  const right = fs.realpathSync(b);
+  return process.platform === "win32" ? left.toLowerCase() === right.toLowerCase() : left === right;
+}
+
 export function discover(root, config) {
   const candidates = fs.readdirSync(root, { withFileTypes: true })
     .filter(entry => entry.isDirectory() && !entry.name.startsWith("."))
@@ -23,7 +29,7 @@ export function discover(root, config) {
   const found = Object.fromEntries(Object.keys(config.repositories).map(id => [id, []]));
   for (const directory of candidates) {
     const top = git(directory, ["rev-parse", "--show-toplevel"]);
-    if (top.status !== 0 || fs.realpathSync(top.stdout.trim()) !== fs.realpathSync(directory)) continue;
+    if (top.status !== 0 || !sameRealpath(top.stdout.trim(), directory)) continue;
     const origin = git(directory, ["remote", "get-url", "origin"]);
     if (origin.status !== 0) continue;
     for (const [id, info] of Object.entries(config.repositories)) {

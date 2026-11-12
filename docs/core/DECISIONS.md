@@ -42,7 +42,7 @@ Create a separate PortfoliOS-Runtime child repository beside the OS and Browser.
 
 Reason: CLI compatibility needs an independent engine/build/release lifecycle without expanding ordinary OS startup. Start with an existing execution-engine evaluation before attempting a complete kernel.
 
-User workflow: public users select a private profile before launching the CLI category; private users authenticate separately with supported ChatGPT/Google AI subscription sign-in. Model API-key billing is not a substitute. Persistent AI-provider credentials and encrypted recovery remain design proposals, not an exception to the current memory-only Google Drive token policy.
+User workflow: public users select a private profile before launching the CLI category; private users authenticate separately with supported ChatGPT/Google AI subscription sign-in. Model API-key billing is not a substitute. Persistent AI-provider credentials and multi-device recovery are implemented via the client-side Zero-Knowledge AES-256-GCM Vault (`vault.enc`), maintaining the rule that plain-text tokens are never written to cloud storage.
 
 Affected repositories: [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration), [OS](https://github.com/Bl4ut0/PortfoliOS), [Browser.JS](https://github.com/Bl4ut0/PortfoliOS-Browser.JS), and planned [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime). Runtime publication is pending.
 
@@ -99,3 +99,26 @@ Use actual `/Desktop` files for shortcuts/folders and its layout JSON for icon p
 The user selected a single active private session instead of simultaneous cross-device editing. Normal takeover must save and sync the previous workspace before releasing ownership. An explicitly forced takeover cannot save an unreachable device, so retain its last uploaded recovery delta and reconcile its remaining local changes when that device next becomes active. Public access remains unrestricted. Google workspace entry now waits for online ownership verification and reconciliation before mounting the selected shell. Preserve conflicting versions and explicit deletion intent rather than using timestamp-only overwrite decisions.
 
 Implemented scope and limits: [OS session handoff framework](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/SESSION_HANDOFF.md). This decision does not claim engine-native save coverage, atomic folder moves, independent-server coordination or retroactive protection of older loaded clients.
+
+
+## STRATEGY-001 - Platform Milestone Delivery Priority: Desktop 1st, Mobile 2nd (Mobile Last)
+
+Date: 2026-11-12. Status: accepted workspace policy.
+
+All future milestone planning, feature development, and architectural verification strictly follow a **Desktop-First** progression order:
+1. **Desktop platform is prioritized first**: The complete windowed workspace, Root `/` POSIX Virtual Filesystem, user-space Linux syscall table, Zero-Knowledge Keyring Vault, terminal developer toolchain, and creative WASM suites are built, validated, and hardened on Desktop.
+2. **Mobile platform is secondary and scheduled last**: Mobile remains an independent, lightweight touch companion sharing core services with Desktop. All primary feature development and system capabilities must land and stabilize on Desktop before mobile touch adaptations, mobile parity, and viewport passes are executed.
+
+Reason: Desktop represents the complete productivity and development surface for PortfoliOS. Hardening the complex window manager, POSIX filesystem, native terminal, and Zero-Knowledge Keyring on Desktop establishes a stable core baseline before adapting interfaces to mobile touch viewports.
+
+Affected repositories: [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration), [OS](https://github.com/Bl4ut0/PortfoliOS), and [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime).
+
+## SECURITY-002 - Zero-Knowledge Vault Recovery (Purge & Re-Initialize) and Multi-Program Authentication
+
+Date: 2026-11-12. Status: implemented.
+
+Because client-side AES-256-GCM + PBKDF2 (600,000 rounds) encryption is strictly Zero-Knowledge, lost or forgotten Master Passphrases cannot be decrypted or backdoored. To prevent users from getting permanently locked out or having corrupted session states:
+1. **Safe Purge & Reset**: Implemented `vault purge` / `window.PortfoliOSVault.purgeAndReset()`. When confirmed (`Type 'PURGE'`), it purges in-memory keys, removes `/etc/portfolios/vault/*.json`, and deletes `/documents/vault.enc`, enabling the user to immediately initialize a new Master Passphrase cleanly without corrupting other files.
+2. **Visual Multi-Program Authentication Modal**: Implemented `#vault-modal` supporting simultaneous credential unlocks for all active CLI tools (`codex`, `agy`, `claude`, `xai`, `github`) with real-time decryption and error handling.
+
+Affected repositories: [OS](https://github.com/Bl4ut0/PortfoliOS) and [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime).

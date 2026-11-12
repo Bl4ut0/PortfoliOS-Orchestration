@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 
 function safePath(value) {
   if (typeof value !== "string" || !value || value.includes("\\") || path.posix.isAbsolute(value) || /[\u0000-\u001f\u007f:<>"|?*]/.test(value) || value.split("/").some(part => !part || [".", ".."].includes(part))) throw new Error("Unsafe deployment path: " + value);
@@ -8,16 +9,64 @@ function safePath(value) {
   return value;
 }
 
+function filterChangedCandidates(osRoot, rawPaths, allowed, skipLarge = [], full = false) {
+  const result = [];
+  for (const raw of rawPaths) {
+    const clean = String(raw || "").trim().replace(/^"(.*)"$/, "$1").replace(/\\/g, "/");
+    if (!clean || clean === "apps/vscode/build" || clean.startsWith("apps/vscode/build/")) continue;
+    try { safePath(clean); } catch { continue; }
+    if (!allowed.some(root => clean === root || clean.startsWith(root + "/"))) continue;
+    if (!full && (/(?:^|\/)gamedata(?:\/|$)/i.test(clean) || skipLarge.some(skip => clean === skip || clean.startsWith(skip + "/")))) continue;
+    if (fs.existsSync(path.join(osRoot, clean))) result.push(clean);
+  }
+  return [...new Set(result)].sort();
+}
+
+export function changedDeployablePaths(osRoot, allowed, skipLarge = [], full = false) {
+  const candidates = new Set();
+  const status = spawnSync("git", ["-C", osRoot, "status", "--porcelain", "-uall"], { encoding: "utf8", windowsHide: true });
+  if (status.status === 0 && status.stdout.trim()) {
+    for (const line of status.stdout.split(/\r?\n/)) {
+      if (!line || line.length < 4) continue;
+      if (line.slice(0, 2).includes("D")) continue;
+      let rel = line.slice(3).trim();
+      if (rel.includes(" -> ")) rel = rel.split(" -> ").pop().trim();
+      candidates.add(rel);
+    }
+  }
+  const upstream = spawnSync("git", ["-C", osRoot, "diff", "--name-only", "--diff-filter=ACMR", "@{upstream}...HEAD"], { encoding: "utf8", windowsHide: true });
+  if (upstream.status === 0 && upstream.stdout.trim()) {
+    for (const line of upstream.stdout.split(/\r?\n/)) if (line.trim()) candidates.add(line.trim());
+  }
+  let filtered = filterChangedCandidates(osRoot, candidates, allowed, skipLarge, full);
+  if (!filtered.length) {
+    const head = spawnSync("git", ["-C", osRoot, "diff-tree", "--no-commit-id", "--name-only", "--diff-filter=ACMR", "-r", "HEAD"], { encoding: "utf8", windowsHide: true });
+    if (head.status === 0 && head.stdout.trim()) {
+      for (const line of head.stdout.split(/\r?\n/)) if (line.trim()) candidates.add(line.trim());
+      filtered = filterChangedCandidates(osRoot, candidates, allowed, skipLarge, full);
+    }
+  }
+  return filtered;
+}
+
 export function planDeployment(osRoot, flags = []) {
   const manifest = JSON.parse(fs.readFileSync(path.join(osRoot, "deploy.config.json"), "utf8"));
   if (manifest.schemaVersion !== 1) throw new Error("Unsupported deployment manifest.");
   const roots = manifest.paths.map(safePath);
+  const skipLarge = (manifest.skipLargeDefault || []).map(safePath);
   const allowed = [...roots, ...(manifest.optionalPaths || []).map(safePath)];
   const full = flags.includes("--full");
+  const changed = flags.includes("--changed");
   const onlyFlag = flags.find(flag => flag.startsWith("--only="));
-  const only = onlyFlag ? onlyFlag.slice(7).split(",").map(safePath) : null;
+  if (changed && onlyFlag) throw new Error("Cannot combine --changed and --only.");
+  const only = onlyFlag
+    ? onlyFlag.slice(7).split(",").map(safePath)
+    : changed
+      ? changedDeployablePaths(osRoot, allowed, skipLarge, full)
+      : null;
+  if (changed && (!only || !only.length)) throw new Error("No changed deployable files found in OS checkout.");
   if (only && only.some(item => !allowed.some(root => item === root || item.startsWith(root + "/")))) throw new Error("Requested path is outside the OS deployment manifest.");
-  const selected = only || roots.filter(item => full || !manifest.skipLargeDefault.includes(item));
+  const selected = only || roots.filter(item => full || !skipLarge.includes(item));
   const files = new Map();
   const skipped = [];
   const visit = relative => {
@@ -33,7 +82,7 @@ export function planDeployment(osRoot, flags = []) {
         const child = relative + "/" + entry;
         // Private files inside otherwise deployable app directories never upload.
         try { safePath(child); } catch { skipped.push(child); continue; }
-        if (!full && /(?:^|\/)gamedata(?:\/|$)/i.test(child)) continue;
+        if (!full && (/(?:^|\/)gamedata(?:\/|$)/i.test(child) || (!only && skipLarge.includes(child)))) { skipped.push(child); continue; }
         visit(child);
       }
     } else if (stat.isFile()) files.set(relative, { relative, absolute, bytes: stat.size });
@@ -70,7 +119,7 @@ export function planDeployment(osRoot, flags = []) {
   const priority = file => file === "index.html" ? 3 : file === "sw.js" ? 2 : file.endsWith(".html") ? 1 : 0;
   const ordered = [...files.values()].sort((a, b) => priority(a.relative) - priority(b.relative) || a.relative.localeCompare(b.relative));
   if (!ordered.length) throw new Error("Deployment selected no files.");
-  return { files: ordered, bytes: ordered.reduce((sum, file) => sum + file.bytes, 0), skipped, full, only: Boolean(only) };
+  return { files: ordered, bytes: ordered.reduce((sum, file) => sum + file.bytes, 0), skipped, full, only: Boolean(only), changed };
 }
 
 export function readEnv(file) {
@@ -108,7 +157,8 @@ export async function uploadPlan(client, settings, plan, onProgress = () => {}) 
 }
 
 export async function deploy(root, osRoot, plan, dryRun = false) {
-  console.log(`PortfoliOS ${dryRun ? "deployment preview" : "deployment"}: ${plan.files.length} files, ${(plan.bytes / 1024 / 1024).toFixed(2)} MiB (${plan.full ? "full" : "quick"}${plan.only ? ", selected paths" : ""}).`);
+  const modeLabel = plan.full ? "full" : plan.changed ? "changed" : "quick";
+  console.log(`PortfoliOS ${dryRun ? "deployment preview" : "deployment"}: ${plan.files.length} files, ${(plan.bytes / 1024 / 1024).toFixed(2)} MiB (${modeLabel}${plan.only && !plan.changed ? ", selected paths" : ""}).`);
   if (plan.skipped.length) console.log(`Skipped ${plan.skipped.length} absent optional assets or private/development entries.`);
   if (dryRun) {
     for (const file of plan.files) console.log(file.relative);

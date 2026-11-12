@@ -26,6 +26,34 @@ Google access tokens are memory-only. Do not store bearer tokens in local/sessio
 
 OS settings and shared services own Google connection and Drive orchestration. Apps save locally through SystemFS and can route users to backup settings. They do not authenticate independently or call sync.
 
+## Pluggable Cloud Auth and Sync Drivers
+
+PortfoliOS modularizes identity authentication and storage synchronization into extensible driver registries:
+- **CloudAuth (`core/cloud-auth.js`)**: Extensible registry for OAuth 2.0 PKCE and identity providers. Built-in drivers:
+  - **Google (`google`)**: Google Identity Services userinfo endpoint and token verification.
+  - **Microsoft (`microsoft`)**: Microsoft Entra ID / Microsoft Graph OAuth 2.0 PKCE (`Files.ReadWrite.AppFolder` scope).
+  - **Dropbox (`dropbox`)**: Dropbox OAuth 2.0 PKCE (`account_info.read`, `files.content.read`, `files.content.write`, online short-lived tokens).
+  - **Nextcloud (`nextcloud`)**: Self-hosted Nextcloud server OAuth 2.0 / OCS user endpoint.
+- **CloudSync (`core/cloud-sync.js`)**: Extensible registry for bi-directional file synchronization and storage management:
+  - **Google Drive (`google-drive`)**: AppData / PortfoliOS sandboxed folder sync using Drive v3 REST APIs.
+  - **OneDrive (`onedrive`)**: Sandboxed `/me/drive/special/approot` discovery, chunked upload, and item streaming via Microsoft Graph API v1.0.
+  - **Dropbox (`dropbox`)**: Sandboxed App folder, `/2/files/*` endpoints, chunked uploads, and space usage quota.
+  - **Nextcloud WebDAV (`nextcloud-webdav`)**: Standard WebDAV HTTP primitives (`PROPFIND`, `MKCOL`, `PUT`, `GET`, `DELETE`) ensuring data sovereignty.
+
+All drivers strictly uphold memory-only token policies: bearer tokens are never written to `localStorage`, `sessionStorage`, or `SystemFS`.
+
+## Zero-Knowledge Keyring and Vault Policy
+
+To balance strict credential protection with seamless multi-device persistence:
+1. **Device-Local Storage**: Decrypted tokens for CLI tools (`codex`, `agy`, `claude`, `xai`, `github`) reside in `/etc/portfolios/vault/` and user dotfiles inside private `SystemFS` (IndexedDB). They are never written to `localStorage` or session query strings.
+2. **Cloud Sync Guard**: Plain-text `/etc` and dotfiles are strictly excluded from Drive and cloud storage synchronization.
+3. **Encrypted Recovery Envelope**: Multi-device credential roaming is achieved via `/documents/vault.enc`, a zero-knowledge envelope encrypted with client-side AES-256-GCM.
+4. **Key Derivation Standards**: The encryption key is derived using PBKDF2-HMAC-SHA512 at 600,000 iterations with a cryptographically random 32-byte salt and 12-byte IV rotated on every export. Downgrades (< 100,000 rounds) are rejected.
+5. **Recovery Workflow**: On a new device, entering the user's Master Passphrase decrypts `vault.enc` into that device's IndexedDB, instantly restoring all tool authorizations without exposing plain-text keys to cloud providers.
+6. **Purge & Re-Initialize Recovery**: Because AES-256-GCM encryption is Zero-Knowledge, forgotten passphrases cannot be decrypted by anyone. A dedicated purge routine (`vault purge` or `window.PortfoliOSVault.purgeAndReset()`) permanently wipes locked tokens from memory, clears `/etc/portfolios/vault/*.json`, and removes `/documents/vault.enc`, allowing the user to configure a fresh Master Passphrase without breaking existing system files.
+7. **Visual Multi-Program Authentication**: A top-level modal dialog (`#vault-modal`) enables simultaneous unlocking of all active CLI tools (`codex`, `agy`, `claude`, `xai`, `github`) with visual error feedback and live password policy checking.
+8. **Delivery Priority**: Keyring and sync capabilities follow the **Desktop 1st, Mobile 2nd (Mobile Last)** milestone priority. Desktop receives all zero-knowledge keyring and sync hardening first; mobile touch adaptations follow desktop validation.
+
 Back up only approved user paths/settings. Exclude hidden account/system records, quarantine, executables, engine assets, models and excluded imports. Preserve scanner metadata during import/restore.
 
 Required-path failures must not advance a successful-backup manifest/timestamp. Active identity or local save completion does not prove upload.

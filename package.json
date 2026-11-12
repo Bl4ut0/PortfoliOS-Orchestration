@@ -11,7 +11,10 @@
     "check": "node scripts/workspace.mjs check",
     "build": "node scripts/workspace.mjs build",
     "import:browser": "node scripts/workspace.mjs import",
+    "push": "node scripts/workspace.mjs push",
+    "push:dry": "node scripts/workspace.mjs push --dry-run",
     "deploy": "node scripts/workspace.mjs deploy",
+    "deploy:changed": "node scripts/workspace.mjs deploy --changed",
     "deploy:dry": "node scripts/workspace.mjs deploy --dry-run",
     "deploy:full": "node scripts/workspace.mjs deploy --full",
     "test": "node --test scripts/tests/*.test.mjs"

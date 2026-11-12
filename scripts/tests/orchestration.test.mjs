@@ -188,3 +188,34 @@ for(const app of ['photocraft','vectorcraft','designcraft','lightcraft','filmcra
 test('LightCraft hidden Rust locks remain hash-verified and never upload',t=>{
  const root=workspace(t);manifest(root);const locks=['.cargo-lock','.cargo-artifact-lock','.cargo-build-lock'];const files=Object.fromEntries(locks.map(name=>[name,{bytes:0,sha256:'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}]));write(root,'apps/lightcraft/release.json',JSON.stringify({version:'0.6.0',files}));for(const name of locks)write(root,'apps/lightcraft/runtime/v0.6.0/'+name,'');assert(!planDeployment(root).files.some(f=>locks.some(name=>f.relative.endsWith('/'+name))));write(root,'apps/lightcraft/runtime/v0.6.0/.cargo-lock','tampered');assert.throws(()=>planDeployment(root),/checksum mismatch/);
 });
+
+
+test("changed deployment (push) selects only Git-modified or newly committed deployable files and skips nested skipLargeDefault in quick mode", t => {
+  const { site, invoke } = cliFixture(t);
+  write(site, "deploy.config.json", JSON.stringify({
+    schemaVersion: 1,
+    paths: ["index.html", "sw.js", "apps", "large.wasm"],
+    skipLargeDefault: ["large.wasm", "apps/openrct2/runtime/RCT.zip"],
+    optionalPaths: ["docs/wasm", "dist", "services/native-relay/sdk"]
+  }));
+  write(site, "apps/openrct2/app.js", "app");
+  write(site, "apps/openrct2/runtime/RCT.zip", "huge-zip");
+  const quickNames = planDeployment(site).files.map(f => f.relative);
+  assert(quickNames.includes("apps/openrct2/app.js"));
+  assert(!quickNames.includes("apps/openrct2/runtime/RCT.zip"));
+  const fullNames = planDeployment(site, ["--full"]).files.map(f => f.relative);
+  assert(fullNames.includes("apps/openrct2/runtime/RCT.zip"));
+
+  execFileSync("git", ["-C", site, "add", "."]);
+  execFileSync("git", ["-C", site, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "-c", "commit.gpgsign=false", "commit", "-qm", "initial"]);
+
+  write(site, "apps/browser/assets/main.js", "updated-main");
+  write(site, "index.html", "updated-index");
+  write(site, "scripts/non-deployable.js", "ignored");
+  const changedPlan = planDeployment(site, ["--changed"]);
+  assert.deepEqual(changedPlan.files.map(f => f.relative), ["apps/browser/assets/main.js", "index.html"]);
+
+  const pushPreview = invoke("push", "--dry-run");
+  assert.equal(pushPreview.status, 0, pushPreview.stderr);
+  assert.match(pushPreview.stdout, /\(changed\)/);
+});
