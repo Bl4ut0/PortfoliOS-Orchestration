@@ -83,3 +83,11 @@ The PortfoliOS Runtime layer interfaces with the OS shell through a structured s
    - `/usr/local/bin/git-credential-portfolios` services standard Git credential queries by retrieving tokens from the Zero-Knowledge Vault.
 5. **Windows Native Messaging Relay**:
    - Connects to `PortfoliOS-NativeRelay` for raw TCP/UDP networking.
+
+## Network transport policy (2026-11-12)
+
+PortfoliOS does not host a general traffic relay or fall back to a paid/public relay. Users must install and enable the Native Relay extension and local Host Bridge for raw TCP/UDP, native CLI networking and proxy-style browsing beyond browser sandbox restrictions. Traffic then originates from their own device/network.
+
+Without the installed relay, only browser-permitted networking is available: HTTPS requests subject to CORS, supported WebSockets/WebRTC and other browser-native capabilities. Browser/CLI/multiplayer interfaces must explain missing capabilities and offer Native Relay setup rather than selecting a remote fallback. Ordinary OS authentication and narrowly scoped backup APIs remain separate services; they are not a general traffic proxy.
+
+Public Wisp discovery, custom Wisp selection, hosted browser allocation and the multiplayer cloud WebSocket fallback are not supported paths. Old saved fallback preferences must not reactivate them. Keep any historical relay test utilities clearly inactive. Browser.JS's external origin-isolation dependency is distinct from traffic relay hosting and must be documented separately.

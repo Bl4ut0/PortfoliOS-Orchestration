@@ -34,7 +34,7 @@ Worker/iframe bridges transfer selected data and explicit operations. Validate o
 
 Record upstream source, notices, source commit, toolchain, artifact checksum and rollback procedure. Import checked releases through a narrow OS adapter.
 
-Browser traffic stays on an authorized external relay/content isolation service. The OS must not silently become a destination-traffic relay. Provider changes are explicit and connection options dismissible.
+Browser, multiplayer and CLI networking remains subject to browser sandbox restrictions until the user installs and enables the Native Relay extension and local Host Bridge. PortfoliOS does not offer hosted/public relay fallback or operate a general destination-traffic relay. Destination traffic uses the user’s device/network. Browser content isolation is a separate dependency, not a relay fallback.
 
 Maintain correspondence between deployed modified runtimes and exact source revisions. Catalog/demo links do not prove local integration, mobile support or save/restore.
 
