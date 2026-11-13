@@ -126,3 +126,5 @@ Affected repositories: [OS](https://github.com/Bl4ut0/PortfoliOS) and [Runtime](
 ## 2026-11-12: Native Relay, no hosted traffic fallback
 
 User decision: do not operate/pay for a fallback relay or route user destination traffic through PortfoliOS hosting. Until the user installs and enables the Native Relay extension and local Host Bridge, browser, multiplayer and CLI networking remains constrained by browser sandbox capabilities. Do not automatically select public/community Wisp, paid remote browsers or central WebSocket-to-UDP relays. Existing tightly scoped OS auth/backup APIs are not changed by this decision. This supersedes older fallback descriptions.
+
+User clarification: retain explicit custom relay/proxy options where the app implements the protocol. Native Relay and user-configured Wisp/compatible game relay are valid opt-in choices; no configured transport means sandbox-limited networking with setup guidance. VPNs can route device traffic but do not replace a browser transport. No automatic relay list, service-owned default or paid fallback.
