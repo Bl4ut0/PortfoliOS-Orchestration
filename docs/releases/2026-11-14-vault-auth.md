@@ -1,10 +1,10 @@
 # Encrypted tool credentials: proposed release 2026.11.14.1
 
-Status: validated and committed locally; publication/production upload pending.
+Status: published to GitHub, deployed and verified at [os.bl4ut0.dev](https://os.bl4ut0.dev/?release=2026.11.14.1) on 2026-11-14T06:20:27.810Z.
 
 OS source: [e6b5978ec48500d58733253c14bfd4cc87b935f5](https://github.com/Bl4ut0/PortfoliOS/commit/e6b5978ec48500d58733253c14bfd4cc87b935f5).
 
-The release also includes the previously prepared opt-in relay policy and checked Browser.JS artifact at [9bf26d38](https://github.com/Bl4ut0/PortfoliOS-Browser.JS/commit/9bf26d38). No hosted/public traffic fallback is introduced. All changes are in their owning repositories; Orchestration tracks only shared policy and release evidence.
+The release also includes the previously prepared opt-in relay policy and checked Browser.JS artifact at [9bf26d38d7bda94c16e9946469b84a2e553aa62d](https://github.com/Bl4ut0/PortfoliOS-Browser.JS/commit/9bf26d38d7bda94c16e9946469b84a2e553aa62d). No hosted/public traffic fallback is introduced. All changes are in their owning repositories; Orchestration tracks only shared policy and release evidence.
 
 ## Resulting behavior
 
@@ -27,7 +27,7 @@ The release also includes the previously prepared opt-in relay policy and checke
 
 Credential-free `deploy --changed --dry-run` selects 20 files / 4.00 MiB, including the checked Browser artifact, Native Relay SDK policy, new vault broker, changed OS controllers/styles, selected workspace HTML and release/cache entry points. Assets precede HTML/service worker/index. No credentials are loaded and no upload occurs during preview. Tests, documentation, local browser fixtures and native auth files are outside the site payload.
 
-Publish OS, Browser.JS and Orchestration commits, then use the configured changed deployment and verify the live release marker, changed asset hashes and Browser receipt. Production verification remains pending until upload. Rollback must preserve private filesystem data and encrypted vault files; do not re-enable plaintext credential fallback or purge accounts to roll back presentation.
+Publish OS, Browser.JS and Orchestration commits, then use the configured changed deployment and verify the live release marker, changed asset hashes and Browser receipt. Production verification passed: 19 static assets match local SHA-256 hashes, the disabled hosted-browser endpoint returns HTTP 410, and the live Browser receipt matches its exact source. Fresh Chrome verifies the release marker, selector → account chooser → public Desktop order, deferred vault initialization, disabled public vault controls, rejected public vault API access and no frontend errors. The actual upload used the explicit reviewed paths after Git publication so changed-mode selection could not omit previously unpublished relay assets. Rollback must preserve private filesystem data and encrypted vault files; do not re-enable plaintext credential fallback or purge accounts to roll back presentation.
 
 ## Remaining gates
 
