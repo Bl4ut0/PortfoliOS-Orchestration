@@ -145,7 +145,7 @@ Verification: broker regressions and a real IndexedDB/browser fixture cover shar
 
 ## MUSIC-001 - Native live-coding music and a shared sample index
 
-Date: 2026-11-14. Status: implemented and locally validated; release publication tracked separately.
+Date: 2026-11-14. Status: published as release 2026.11.14.2; see [release evidence](../releases/2026-11-14-loop-studio.md).
 
 Use a self-hosted checksum-pinned Strudel Web Audio engine behind a native Loop Studio editor. Interpret a bounded pattern-expression subset through allowed library calls rather than evaluating arbitrary user/model JavaScript. Preserve the current running pattern after invalid edits, shared OS volume/mute, user-reviewed model proposals, SystemFS project/recording saves, and real discard/close behavior.
 
