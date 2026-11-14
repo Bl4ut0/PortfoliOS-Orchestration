@@ -21,6 +21,9 @@
         ],
         [
           "scripts/check-vault-cloud-state.js"
+        ],
+        [
+          "scripts/check-loop-studio.js"
         ]
       ]
     },

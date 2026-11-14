@@ -141,3 +141,18 @@ Use Codex auth-file import as the first concrete storage workflow. New credentia
 Affected repositories: [OS](https://github.com/Bl4ut0/PortfoliOS) owns executable storage/UI/bridge; [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) owns this contract; [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime) must consume the OS service when its production process adapter is connected. No duplicate credential authority.
 
 Verification: broker regressions and a real IndexedDB/browser fixture cover shared consumers, two accounts, reload/unlock, cancellation, public/private isolation, unused cleanup and ciphertext-only writes. Synthetic fixtures make no provider requests. A separate synthetic Drive/session handoff fixture restores encrypted Codex credentials between isolated browsers, revokes old access, and covers offline conflict recovery/cancellation. Targeted startup passes keep prior baselines for untouched files. Live CLI launch, login/refresh writeback, an authenticated request after reload, real cloud recovery and Mobile adaptation remain open. See [the executable contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/VAULT_AUTH.md).
+
+
+## MUSIC-001 - Native live-coding music and a shared sample index
+
+Date: 2026-11-14. Status: implemented and locally validated; release publication tracked separately.
+
+Use a self-hosted checksum-pinned Strudel Web Audio engine behind a native Loop Studio editor. Interpret a bounded pattern-expression subset through allowed library calls rather than evaluating arbitrary user/model JavaScript. Preserve the current running pattern after invalid edits, shared OS volume/mute, user-reviewed model proposals, SystemFS project/recording saves, and real discard/close behavior.
+
+Keep shared public sound packs under the OS's `data/sounds`, with a generated catalog of stable sound IDs, categories, sizes, hashes and actual license/source metadata. Apps can use this as a fallback when they have no sound bank. Source/audio files and catalog publish together; index refresh is explicit, and content hashes identify updated sample bytes. Public static assets never enumerate private SystemFS recordings.
+
+Only explicit playback loads the Strudel bundle and needed samples. Used code/sounds can be cached without expanding the boot precache. The existing Local AI service remains off until enabled by the user; music composition is local-only at entry and dispatch. Five scoped MCP tools use a local MessagePort and cannot save files, start playback or access the vault/network.
+
+Affected repositories: [OS](https://github.com/Bl4ut0/PortfoliOS) owns the application, index, importer, source/license notices and tests; [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) owns these shared standards and release coordination. The Strudel engine remains upstream and unmodified.
+
+Evidence: actual Web Audio signal and recording, shared sample changes, system mute, native file dialogs, private reload/isolation, cancellation/discard, minimize/close, offline replay after loading, theme/narrow-layout checks, model-plumbing fixtures and MCP initialize/list/call tests. This does not certify native Mobile, real phone audio latency, every Strudel function, real model composition quality or an externally reachable MCP server. [App contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/apps/loop-studio/README.md), [sound library](https://github.com/Bl4ut0/PortfoliOS/blob/main/data/sounds/README.md).
