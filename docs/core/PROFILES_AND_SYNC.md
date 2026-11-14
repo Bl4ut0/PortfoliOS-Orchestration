@@ -42,17 +42,19 @@ PortfoliOS modularizes identity authentication and storage synchronization into 
 
 All drivers strictly uphold memory-only token policies: bearer tokens are never written to `localStorage`, `sessionStorage`, or `SystemFS`.
 
-## Zero-Knowledge Keyring and Vault Policy
+## Tool credential vault policy
 
-To balance strict credential protection with seamless multi-device persistence:
-1. **Device-Local Storage**: Decrypted tokens for CLI tools (`codex`, `agy`, `claude`, `xai`, `github`) reside in `/etc/portfolios/vault/` and user dotfiles inside private `SystemFS` (IndexedDB). They are never written to `localStorage` or session query strings.
-2. **Cloud Sync Guard**: Plain-text `/etc` and dotfiles are strictly excluded from Drive and cloud storage synchronization.
-3. **Encrypted Recovery Envelope**: Multi-device credential roaming is achieved via `/documents/vault.enc`, a zero-knowledge envelope encrypted with client-side AES-256-GCM.
-4. **Key Derivation Standards**: The encryption key is derived using PBKDF2-HMAC-SHA512 at 600,000 iterations with a cryptographically random 32-byte salt and 12-byte IV rotated on every export. Downgrades (< 100,000 rounds) are rejected.
-5. **Recovery Workflow**: On a new device, entering the user's Master Passphrase decrypts `vault.enc` into that device's IndexedDB, instantly restoring all tool authorizations without exposing plain-text keys to cloud providers.
-6. **Purge & Re-Initialize Recovery**: Because AES-256-GCM encryption is Zero-Knowledge, forgotten passphrases cannot be decrypted by anyone. A dedicated purge routine (`vault purge` or `window.PortfoliOSVault.purgeAndReset()`) permanently wipes locked tokens from memory, clears `/etc/portfolios/vault/*.json`, and removes `/documents/vault.enc`, allowing the user to configure a fresh Master Passphrase without breaking existing system files.
-7. **Visual Multi-Program Authentication**: A top-level modal dialog (`#vault-modal`) enables simultaneous unlocking of all active CLI tools (`codex`, `agy`, `claude`, `xai`, `github`) with visual error feedback and live password policy checking.
-8. **Delivery Priority**: Keyring and sync capabilities follow the **Desktop 1st, Mobile 2nd (Mobile Last)** milestone priority. Desktop receives all zero-knowledge keyring and sync hardening first; mobile touch adaptations follow desktop validation.
+CLI/tool credentials use the OS-owned encrypted broker. Persist account records and saved subsystem links only in the active private profile's `/documents/vault.enc`; new plaintext `/etc` keyrings, home auth files and browser-storage token caches are prohibited. Google/other workspace sync authorization remains memory-only and is not implicitly captured as a CLI login.
+
+The vault encrypts before every local write with AES-256-GCM, a fresh 12-byte IV, and profile-bound authenticated data. PBKDF2-HMAC-SHA512 derives its in-memory key at 600,000 rounds using a random 32-byte salt created at setup. Unlock after reload restores saved credentials and links, not a verified provider session. Provider refresh/re-authentication follows the real tool's requirements. The passphrase and decrypted records stay in memory while unlocked.
+
+Each registered subsystem chooses a saved account and obtains temporary revocable access. Releasing access or closing an app does not delete a saved login. Unlinking affects only that consumer. A referenced login cannot be removed; after the last unlink, offer explicit removal or retention. Never automatically erase it on app close or logout. Different accounts for one provider stay distinct.
+
+Lock, workspace lock, profile switch, teardown and peer vault replacement revoke cached access. Stale writes use expected-record/expected-absence checks. Divergent encrypted vault copies stop sync without automatic overwrite. A synthetic two-browser handoff verifies encrypted restore; this does not prove real cloud-account recovery or merge independent ciphertext. Existing v1 encrypted envelopes require their matching profile and explicit unlock. Unowned global plaintext keyrings must not be assigned to another profile or silently deleted; attributable legacy migration encrypts successfully before removing the old copy.
+
+Purge removes the selected profile's encrypted file and unlocked access, not other profiles, provider-side tokens or existing remote recovery copies. PortfoliOS cannot recover a forgotten passphrase. Length requirements must not be advertised as a proven entropy score.
+
+Desktop Settings/CLI own the current manager. Critical private startup restores the encrypted vault before tool access. Native CLI process launch, ephemeral auth materialization and refresh writeback, live Codex/Antigravity provider tests, real cloud restore and later Mobile adaptation remain acceptance gates. A network relay does not provide process execution. The Runtime library must consume the OS broker rather than maintain a second plaintext vault. See [the executable OS contract and verification](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/VAULT_AUTH.md).
 
 Back up only approved user paths/settings. Exclude hidden account/system records, quarantine, executables, engine assets, models and excluded imports. Preserve scanner metadata during import/restore.
 

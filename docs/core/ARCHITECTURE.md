@@ -31,7 +31,7 @@ Children remain independent Git checkouts ignored by the orchestration repositor
 | --- | --- |
 | Boot and selector | Essential script/styles, viewport setup, typed introduction and experience controls |
 | Selected experience sign-in | Shared chooser and on-demand auth; download only the selected shell in the background |
-| Profile selected | Activate profile storage/security; Google profiles acquire the single active lease and reconcile retained/cloud state before preferences and workspace mounting |
+| Profile selected | Activate profile storage/security; Google profiles acquire the single active lease and reconcile critical profile state (including encrypted vault ciphertext) before preferences and workspace mounting; other documents can continue restoring afterward |
 | Workspace ready | Continue eligible automatic private backup after the initial Google lease/recovery gate; start deferred services |
 | App opened | Load that app's controls, styles, engine, WASM, workers, fonts and other expensive assets |
 
@@ -74,13 +74,13 @@ The PortfoliOS Runtime layer interfaces with the OS shell through a structured s
    - `SystemFS` mounts root `/`, providing standard POSIX directories (`/`, `/home/<user>`, `/usr/local/bin`, `/etc`, `/tmp`, `/documents`).
    - Boundary enforcement strictly blocks directory traversal escapes above root `/`.
 2. **User-Space Linux x86_64 Syscall Translation**:
-   - Implemented in `posix-syscall-table.js`, translating guest POSIX system calls (`sys_open`, `sys_read`, `sys_write`, `sys_close`, `sys_stat`, `sys_getdents64`, `sys_socket`, `sys_connect`, `sys_ioctl`, `sys_brk`) directly to browser connectors without emulated hypervisors or heavy Linux OS distributions.
+   - Source connector mappings in `posix-syscall-table.js` describe guest POSIX system calls (`sys_open`, `sys_read`, `sys_write`, `sys_close`, `sys_stat`, `sys_getdents64`, `sys_socket`, `sys_connect`, `sys_ioctl`, `sys_brk`) to browser connectors; this does not establish executable Linux/CLI compatibility. The native relay currently supplies network capabilities, not a complete process/PTY service.
 3. **Zero-Knowledge Keyring Vault**:
    - Client-side AES-256-GCM + PBKDF2-HMAC-SHA512 (600,000 rounds) protects CLI tool subscriptions (`codex`, `agy`, `claude`, `xai`, `github`).
-   - Plain-text credentials remain in local IndexedDB. Only the client-side encrypted envelope `/documents/vault.enc` synchronizes to cloud storage.
-   - Built-in Setup & Recovery (Purge & Re-Initialize) and Visual Multi-Program Authentication Modal allow safe recovery if passwords are forgotten and simultaneous unlocking across all active programs.
+   - The OS persists only encrypted `/documents/vault.enc`; unlocked keys and records remain in memory. Explicit subsystem bindings survive reload, while temporary access is revoked on lock/profile change.
+   - Desktop Saved Logins supports Codex auth-file import, multiple accounts, explicit links and confirmed unused removal. Purge resets the selected local vault; it does not recover a lost passphrase or erase remote copies. See [the OS credential contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/VAULT_AUTH.md).
 4. **Git Credential Helper**:
-   - `/usr/local/bin/git-credential-portfolios` services standard Git credential queries by retrieving tokens from the Zero-Knowledge Vault.
+   - The seeded helper refuses to print secrets in terminal output. Scoped native Git credential delivery remains an implementation gate.
 5. **Windows Native Messaging Relay**:
    - Connects to `PortfoliOS-NativeRelay` for raw TCP/UDP networking.
 

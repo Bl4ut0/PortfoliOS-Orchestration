@@ -58,18 +58,18 @@ For app forks and build/import details, see [the browser workspace guide](https:
 
 ## Structured Access System & Runtime Integration
 
-The Runtime provides browser-native POSIX binary and command-line compatibility without adding heavy Linux container images or virtual machines:
+The runtime source defines VFS, process, PTY and network connector scaffolding. Full native CLI execution and authenticated provider roundtrips are not yet verified:
 
 1. **Root `/` POSIX Virtual Filesystem**:
    - Seamlessly mounts `/`, `/home/<user>`, `/usr/local/bin`, `/etc`, `/tmp`, and `/documents` backed by IndexedDB (`SystemFS`) with strict root boundary traversal enforcement.
 2. **User-Space Linux x86_64 Syscall Translation Table**:
-   - Directly translates Linux x86_64 syscalls (`sys_open`, `sys_read`, `sys_write`, `sys_close`, `sys_stat`, `sys_getdents64`, `sys_socket`, `sys_connect`, `sys_ioctl`, `sys_brk`) into browser secondary connectors.
+   - Defines source mappings for Linux x86_64 syscalls (`sys_open`, `sys_read`, `sys_write`, `sys_close`, `sys_stat`, `sys_getdents64`, `sys_socket`, `sys_connect`, `sys_ioctl`, `sys_brk`) into browser secondary connectors.
 3. **Zero-Knowledge Keyring Vault**:
    - Client-side AES-256-GCM encryption with 128-bit authentication tags and PBKDF2-HMAC-SHA512 key derivation at 600,000 rounds.
-   - Synchronizes only encrypted `/documents/vault.enc` to cloud storage while strictly blocking unencrypted `/etc/portfolios/vault/` and dotfiles.
-   - Built-in Setup & Recovery (Purge & Re-Initialize) and Visual Multi-Program Authentication Modal for simultaneously unlocking `codex`, `agy`, `claude`, `xai`, and `github`.
+   - Persists encrypted account records and subsystem links only in profile-scoped `/documents/vault.enc`; unlocked secrets remain in memory. See [the OS vault contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/VAULT_AUTH.md).
+   - Desktop Saved Logins imports Codex credentials, keeps multiple accounts, and offers explicit removal only after saved subsystem references are gone. Native tool login/refresh execution remains open.
 4. **Git Credential Helper**:
-   - `/usr/local/bin/git-credential-portfolios` automatically services Git HTTPS authentication from stored vault tokens.
+   - Manual `git-credential-portfolios` execution refuses to expose credentials in terminal output; a native scoped Git connector remains required.
 5. **Windows Native Messaging Relay**:
    - Lightweight host (`PortfoliOS-NativeRelay.msi`) and browser extension providing raw TCP/UDP networking.
 

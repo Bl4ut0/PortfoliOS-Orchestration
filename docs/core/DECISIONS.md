@@ -128,3 +128,16 @@ Affected repositories: [OS](https://github.com/Bl4ut0/PortfoliOS) and [Runtime](
 User decision: do not operate/pay for a fallback relay or route user destination traffic through PortfoliOS hosting. Until the user installs and enables the Native Relay extension and local Host Bridge, browser, multiplayer and CLI networking remains constrained by browser sandbox capabilities. Do not automatically select public/community Wisp, paid remote browsers or central WebSocket-to-UDP relays. Existing tightly scoped OS auth/backup APIs are not changed by this decision. This supersedes older fallback descriptions.
 
 User clarification: retain explicit custom relay/proxy options where the app implements the protocol. Native Relay and user-configured Wisp/compatible game relay are valid opt-in choices; no configured transport means sandbox-limited networking with setup guidance. VPNs can route device traffic but do not replace a browser transport. No automatic relay list, service-owned default or paid fallback.
+
+
+## AUTH-003 - Persistent encrypted tool accounts and subsystem access
+
+Date: 2026-11-14. Status: OS implementation and local fixture validation; native CLI provider roundtrip remains open.
+
+The vault is the persistent source of tool credentials. Save encrypted account records and explicit consumer bindings; use revocable temporary access while a subsystem is running. Keep referenced credentials. When the final subsystem is unlinked, offer removal with confirmation or retain for later. Closing a tool never deletes its saved login. Multiple provider accounts are independent, and PortfoliOS workspace identity never fabricates tool authentication.
+
+Use Codex auth-file import as the first concrete storage workflow. New credentials persist only in profile-bound `/documents/vault.enc`; passphrases and plaintext stay in memory. Unowned historical keyrings are hidden and preserved rather than assigned to a new user. A matching old encrypted envelope can be explicitly unlocked/upgraded. Scoped legacy plaintext migration encrypts before deletion. This supersedes the plaintext-device-keyring and purge-all claims in SECURITY-002; local purge does not erase historical records, other profiles or remote recovery copies.
+
+Affected repositories: [OS](https://github.com/Bl4ut0/PortfoliOS) owns executable storage/UI/bridge; [Orchestration](https://github.com/Bl4ut0/PortfoliOS-Orchestration) owns this contract; [Runtime](https://github.com/Bl4ut0/PortfoliOS-Runtime) must consume the OS service when its production process adapter is connected. No duplicate credential authority.
+
+Verification: broker regressions and a real IndexedDB/browser fixture cover shared consumers, two accounts, reload/unlock, cancellation, public/private isolation, unused cleanup and ciphertext-only writes. Synthetic fixtures make no provider requests. A separate synthetic Drive/session handoff fixture restores encrypted Codex credentials between isolated browsers, revokes old access, and covers offline conflict recovery/cancellation. Targeted startup passes keep prior baselines for untouched files. Live CLI launch, login/refresh writeback, an authenticated request after reload, real cloud recovery and Mobile adaptation remain open. See [the executable contract](https://github.com/Bl4ut0/PortfoliOS/blob/main/docs/VAULT_AUTH.md).

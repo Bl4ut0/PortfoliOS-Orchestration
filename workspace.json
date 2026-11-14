@@ -12,6 +12,15 @@
         ],
         [
           "scripts/check-security-kernel.js"
+        ],
+        [
+          "scripts/check-runtime-bridge.js"
+        ],
+        [
+          "scripts/check-credential-vault.js"
+        ],
+        [
+          "scripts/check-vault-cloud-state.js"
         ]
       ]
     },
